@@ -1,5 +1,5 @@
 -- xmake
-set_xmakever("2.5.4")
+set_xmakever("2.5.5")
 add_rules("plugin.vsxmake.autoupdate")
 
 -- global
@@ -17,19 +17,25 @@ target("Detours")
     add_files("Detours/src/*.cpp|uimports.cpp")
 
 target("Unittest")
-    set_kind("binary")
+    set_kind("shared")
     add_deps("Detours")
-    add_files("src/unittest.cpp")
+    add_files("test/unittest.cpp", "test/module.def")
+    if is_arch("x64") then
+        set_basename("Unittest64")
+    else
+        set_basename("Unittest32")
+    end
 
 target("DetoursX")
     add_rules("wdk.static", "wdk.env.wdm")
-    add_files("src/*.cpp|uimports.cpp|unittest.cpp")
+    add_files("src/*.cpp|uimports.cpp")
 
 target("UnittestX")
     add_rules("wdk.driver", "wdk.env.wdm")
     set_values("wdk.sign.mode", "test")
     add_deps("DetoursX")
-    add_files("src/unittest.cpp", "src/unittest.inf")
+    add_ldflags("/INTEGRITYCHECK")
+    add_files("test/unittest.cpp", "test/unittest.inf")
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
